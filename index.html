@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Elif & Yusuf | Bizim Hikâyemiz</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+
+/* =========================
+   TEMEL AYARLAR
+========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #fdfbf7;
+    color: #4b3a2a;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+/* =========================
+   HAREKETLİ & ZARİF ARKA PLAN
+========================= */
+.bg {
+    position: fixed;
+    inset: 0;
+    z-index: -5;
+    background: radial-gradient(circle at top left, #fffcf5, #f5eadd);
+    overflow: hidden;
+}
+
+.blob {
+    position: absolute;
+    filter: blur(90px);
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: float 20s infinite alternate ease-in-out;
+}
+
+.blob1 { width: 50vw; height: 50vw; background: #faebd7; top: -10%; left: -10%; }
+.blob2 { width: 40vw; height: 40vw; background: #fff0f5; bottom: -10%; right: -10%; animation-delay: -5s; }
+
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(100px, 50px) scale(1.2); }
+}
+
+/* =========================
+   GİRİŞ (HERO) EKRANI
+========================= */
+.hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+    position: relative;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    bottom: 40px;
+    width: 1px;
+    height: 60px;
+    background: #b08a4a;
+    animation: scrollLine 2s infinite;
+}
+
+@keyframes scrollLine {
+    0% { transform: scaleY(0); transform-origin: top; opacity: 0; }
+    50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+    50.1% { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+    100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+}
+
+.hero h1 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(4rem, 10vw, 8rem);
+    font-weight: 600;
+    letter-spacing: -2px;
+    margin-bottom: 20px;
+    background: linear-gradient(45deg, #5c4028, #9b7754);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+    max-width: 600px;
+    margin: auto;
+    font-size: 1.1rem;
+    line-height: 2.2;
+    color: #6f5a45;
+    font-weight: 300;
+}
+
+.tag {
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: #b08a4a;
+    margin-bottom: 25px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* =========================
+   EDİTÖRYAL HİKAYE DÜZENİ
+========================= */
+.story-section {
+    padding: 100px 8%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.title {
+    text-align: center;
+    font-family: "Playfair Display", serif;
+    font-size: 3.5rem;
+    font-style: italic;
+    margin-bottom: 100px;
+    color: #6b4e2f;
+    opacity: 0.8;
+}
+
+/* =========================
+   ANI BLOKLARI (OVERLAP TASARIM)
+========================= */
+.memory {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    align-items: center;
+    margin-bottom: 200px;
+    position: relative;
+}
+
+.memory img {
+    grid-column: 1 / 8;
+    grid-row: 1;
+    width: 100%;
+    height: 70vh;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.1);
+    transition: transform 0.7s cubic-bezier(0.165, 0.84, 0.44, 1);
+    z-index: 1;
+}
+
+.memory:hover img {
+    transform: scale(1.02) translateY(-10px);
+}
+
+.memory.right img {
+    grid-column: 6 / 13;
+}
+
+/* CAM EFEKTLİ KARTLAR (GLASSMORPHISM) */
+.card {
+    grid-column: 7 / 13;
+    grid-row: 1;
+    z-index: 2;
+    padding: 60px 50px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    transform: translateY(30px);
+}
+
+.memory.right .card {
+    grid-column: 1 / 7;
+}
+
+.card h2 {
+    font-family: "Playfair Display", serif;
+    font-size: 2.8rem;
+    margin-bottom: 20px;
+    color: #4a3420;
+}
+
+.card .date {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #b08a4a;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.card p {
+    line-height: 2;
+    color: #6c5846;
+    font-weight: 300;
+    font-size: 1.05rem;
+}
+
+/* =========================
+   SÖZ VE MEKTUP
+========================= */
+.quote {
+    text-align: center;
+    padding: 100px 10%;
+    background: rgba(218, 196, 161, 0.1);
+    margin: 100px 0;
+}
+
+.quote h2 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.6;
+    color: #6b4b2b;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.letter-wrapper {
+    padding: 100px 20px;
+}
+
+.letter {
+    max-width: 700px;
+    margin: auto;
+    padding: 80px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    border-radius: 4px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.04);
+    text-align: left;
+    position: relative;
+}
+
+/* Mektup Kağıdı Efekti */
+.letter::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border: 1px solid rgba(190, 150, 80, 0.3);
+    margin: 15px;
+    pointer-events: none;
+}
+
+.letter h2 {
+    font-family: "Playfair Display", serif;
+    font-size: 3rem;
+    margin-bottom: 40px;
+    color: #4a3420;
+    text-align: center;
+}
+
+.letter p {
+    line-height: 2.4;
+    color: #5c4b39;
+    font-weight: 300;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.signature {
+    text-align: right;
+    font-family: "Playfair Display", serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    color: #b08a4a;
+    margin-top: 50px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+footer {
+    text-align: center;
+    padding: 60px 20px;
+    color: #8b6f52;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+}
+
+/* =========================
+   MOBİL UYUM (RESPONSIVE)
+========================= */
+@media(max-width: 1024px) {
+    .memory img { height: 50vh; }
+    .card { padding: 40px 30px; }
+}
+
+@media(max-width: 768px) {
+    .memory, .memory.right {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 120px;
+    }
+    
+    .memory img {
+        height: 45vh;
+        width: 100%;
+        border-radius: 12px;
+    }
+
+    .card {
+        width: 90%;
+        margin: -80px auto 0; /* Kartı fotoğrafın üstüne taşıdırır */
+        transform: none;
+        padding: 30px 20px;
+        text-align: center;
+    }
+
+    .letter { padding: 40px 20px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+</div>
+
+<section class="hero">
+    <div>
+        <div class="tag">Bizim Hikâyemiz</div>
+        <h1>Yusuf & Elif</h1>
+        <p>
+            Bu çiçek solunca yerine yenisi gelir.<br>
+            Anılarımız hep böyle yaptı.
+        </p>
+    </div>
+</section>
+
+<section class="story-section">
+    <div class="title">Unutulmaz Anlarımız</div>
+
+    <div class="memory">
+        <img src="foto1.jpg" alt="İlk Tanışma">
+        <div class="card">
+            <span class="date">Bölüm I</span>
+            <h2>İlk Karne</h2>
+            <p>Her şey sıradan bir gündü. Ama bazı günler sonradan "başlangıç" olur. O an ikimiz de hayatımızın nasıl değişeceğini bilmiyorduk.</p>
+        </div>
+    </div>
+
+    <div class="memory right">
+        <div class="card">
+            <span class="date">Bölüm II</span>
+            <h2>O İlk Gülüş</h2>
+            <p>O anı net hatırlıyorum. Gülümsediğinde içimde bir şeylerin yer değiştirdiğini fark ettim. Sanki zaman bir saniyeliğine durmuştu.</p>
+        </div>
+        <img src="foto2.jpg" alt="İlk Gülüş">
+    </div>
+
+    <div class="memory">
+        <img src="foto3.jpg" alt="İlk Kahve">
+        <div class="card">
+            <span class="date">Bölüm III</span>
+            <h2>İlk Kahve</h2>
+            <p>Saatlerce konuşup hiç susmadığımız o gün... En basit anların bile seninle olunca ne kadar özel olabildiğini o gün anladım.</p>
+        </div>
+    </div>
+
+    <div class="memory right">
+        <div class="card">
+            <span class="date">Bölüm IV</span>
+            <h2>Yan Yana Yürümek</h2>
+            <p>Nereye gittiğimizin hiçbir önemi yoktu. Saatler değil, seninle geçen saniyeler bile yetiyordu. En güzel manzara aslında solumdaydı.</p>
+        </div>
+        <img src="foto4.jpg" alt="Yürüyüş">
+    </div>
+
+    <div class="memory">
+        <img src="foto5.jpg" alt="Sonsuz">
+        <div class="card">
+            <span class="date">Bölüm V</span>
+            <h2>Sonsuzluk</h2>
+            <p>Belki dünyadaki her şey değişir, zaman akıp gider... Ama içimdeki bazı hislerin, sana olan bu bağın hiç değişmeyeceğini biliyorum.</p>
+        </div>
+    </div>
+
+</section>
+
+<section class="quote">
+    <h2>“Dünyanın en güzel hikâyesi, altı çizili cümlelerle değil, birlikte geçirilen sessiz anlarla yazılır..Ve hikayenin başlangıcı seninle başladı. Sonu ise hiç gelmeyecek; çünkü seninle paylaştığımız sessizlik, zamanın bile eskitemeyeceği bir ömre dönüşecek.Bizden sonrada hatırlanacak. ”</h2>
+</section>
+
+<section class="letter-wrapper">
+    <div class="letter">
+        <h2>Sevgili Elif,</h2>
+        <p>Hayat bazen çok hızlı akıyor, her şey bir telaş içinde geçip gidiyor.İlerisi hakkında konuşuyoruz ve plan yapıyoruz.</p>
+        <p>Biz birbirimizin gençlik aşkıyız . Suan dur ve bu zamana kadar geçirdiğimiz vakti ve anıları düşün.</p>
+        <p>Belki de bu anlar, hayatımızın en değerli unsurlarıdır.Hicbiri lüx içinde değil ancak ileride lüx icinde oldugunda degerin etrafımızda dönen seyler degil bizim içimizden geldigini anlayacağız.</p>
+        <p>Ne kadar genç olduğunu hatırla ve hiçbirşeye geç kalmadığını bil.</p>
+        <p>Düşündüğünden daha güzel bir hayatın olacak.</p>
+        <p>İyi ki varsın, iyi ki yanımdasın.</p>
+        <div class="signature">Yusuf</div>
+    </div>
+</section>
+
+<footer>
+    yusufufus
+</footer>
+
+</body>
+</html>
