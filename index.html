@@ -3,433 +3,649 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>canım - Bizim Hikayemiz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+    <title>Sonsuz Aşkım · Yeşil Bahçe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Apple fontu: SF Pro'ya en yakın sistem fontları + Inter fallback -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* TEMEL AYARLAR */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            cursor: none; /* Özel imleç kullanacağımız için varsayılanı gizledik */
+        :root {
+            --sf-font: -apple-system, BlinkMacSystemFont, 'Inter', "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            --apple-ease: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         body {
-            background-color: #050505;
-            color: #fff;
-            font-family: 'Playfair Display', serif;
+            font-family: var(--sf-font);
             overflow-x: hidden;
+            background-color: #d9f2e0;
+            color: #143d24;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            min-height: 100vh;
+            letter-spacing: -0.011em;
         }
 
-        /* ARKA PLAN ÇİZGİLER VE KALPLER */
-        #embers-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            pointer-events: none;
+        /* Apple tipografi hiyerarşisi */
+        .apple-title {
+            font-family: var(--sf-font);
+            font-weight: 600;
+            letter-spacing: -0.025em;
         }
 
-        /* ÖZEL İMLEÇ */
-        .custom-cursor {
-            position: fixed;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #d90429;
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            transition: width 0.2s, height 0.2s, background-color 0.2s;
-            z-index: 9999;
-            box-shadow: 0 0 10px #d90429;
-        }
-        .cursor-dot {
-            position: fixed;
-            width: 6px;
-            height: 6px;
-            background-color: #ef233c;
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            z-index: 10000;
-        }
-
-        /* GİRİŞ EKRANI */
-        .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-family: 'Cinzel', serif;
-            font-size: 4rem;
-            color: #d90429;
-            text-shadow: 0 0 20px rgba(217, 4, 41, 0.5);
-            letter-spacing: 5px;
-            animation: pulse 3s infinite alternate;
-        }
-
-        .scroll-down {
-            margin-top: 50px;
-            font-size: 1.2rem;
-            color: #888;
-            letter-spacing: 2px;
-            animation: bounce 2s infinite;
-        }
-
-        /* HİKAYE & ŞİİR ALANI (ZİG-ZAG) */
-        .story-container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 50px 20px;
-        }
-
-        .story-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15vh;
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .story-item.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .story-item.left { flex-direction: row; }
-        .story-item.right { flex-direction: row-reverse; }
-
-        .story-item.center {
-            flex-direction: column;
-            text-align: center;
-            margin-top: 10vh;
-            margin-bottom: 20vh;
-        }
-
-        /* FOTOĞRAFLAR */
-        .image-wrapper {
-            flex: 0 0 45%;
-            position: relative;
-            overflow: hidden;
-            border-radius: 5px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.8);
-        }
-
-        .image-wrapper img {
-            width: 100%;
-            display: block;
-            filter: grayscale(100%) contrast(1.2);
-            transition: all 0.6s ease;
-        }
-
-        .image-wrapper:hover img {
-            filter: grayscale(0%) contrast(1.1);
-            transform: scale(1.05);
-        }
-
-        .image-wrapper::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            box-shadow: inset 0 0 0 0 rgba(217, 4, 41, 0);
-            transition: all 0.5s ease;
-            pointer-events: none;
-        }
-
-        .image-wrapper:hover::after {
-            box-shadow: inset 0 0 30px 5px rgba(217, 4, 41, 0.6);
-        }
-
-        /* ŞİİR METİNLERİ */
-        .poem-text {
-            flex: 0 0 45%;
-            font-size: 1.8rem;
-            line-height: 1.6;
-            color: #e0e0e0;
-            text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
-            position: relative;
-        }
-
-        .poem-text::before {
-            content: '';
-            position: absolute;
-            width: 30px;
-            height: 2px;
-            background-color: #d90429;
-            top: -15px;
-        }
-
-        .story-item.right .poem-text {
-            text-align: right;
-        }
-        .story-item.right .poem-text::before {
-            right: 0;
-        }
-
-        .poem-text.highlight {
-            color: #d90429;
-            font-size: 2.2rem;
+        .apple-large-title {
+            font-family: var(--sf-font);
             font-weight: 700;
-            text-shadow: 0 0 15px rgba(217, 4, 41, 0.4);
-            margin-top: 30px;
-        }
-        .poem-text.highlight::before { display: none; }
-
-        /* MERKEZ FOTOĞRAF (7. Foto) */
-        .story-item.center .image-wrapper {
-            width: 80%;
-            max-width: 700px;
-            margin: 0 auto;
+            letter-spacing: -0.03em;
         }
 
-        /* ANİMASYONLAR */
-        @keyframes pulse {
-            0% { transform: scale(1); text-shadow: 0 0 20px rgba(217, 4, 41, 0.5); }
-            100% { transform: scale(1.02); text-shadow: 0 0 40px rgba(217, 4, 41, 0.9); }
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(10px); }
+        .apple-body {
+            font-family: var(--sf-font);
+            font-weight: 400;
+            letter-spacing: -0.011em;
         }
 
-        /* MOBİL UYUM */
-        @media (max-width: 768px) {
-            .story-item.left, .story-item.right {
-                flex-direction: column;
-                text-align: center;
-            }
-            .image-wrapper, .poem-text {
-                flex: 0 0 100%;
-                width: 100%;
-            }
-            .poem-text {
-                margin-top: 30px;
-                font-size: 1.4rem;
-            }
-            .poem-text::before {
-                left: 50%;
-                transform: translateX(-50%);
-            }
-            .hero h1 { font-size: 2.5rem; }
+        /* 1. AÇIK FERAH YEŞİL ARKA PLAN */
+        .apple-gradient-bg {
+            background: radial-gradient(circle at var(--mouse-x, 30%) var(--mouse-y, 30%), rgba(167, 243, 208, 0.55) 0%, transparent 55%),
+                        radial-gradient(circle at 85% 15%, rgba(134, 239, 172, 0.5) 0%, transparent 50%),
+                        radial-gradient(circle at 15% 85%, rgba(187, 247, 208, 0.55) 0%, transparent 55%),
+                        linear-gradient(160deg, #ecfdf3 0%, #d1fae0 35%, #bbf7d0 65%, #d8f5e4 100%);
+            background-size: 150% 150%;
+            transition: background 0.25s ease-out;
         }
+
+        /* 2. APPLE LIQUID GLASS */
+        .apple-glass {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 24px 50px -12px rgba(20, 90, 55, 0.2),
+                        0 12px 28px -14px rgba(20, 90, 55, 0.15),
+                        inset 0 1px 1px rgba(255, 255, 255, 0.9);
+            transition: transform 0.4s var(--apple-ease), box-shadow 0.4s var(--apple-ease), border-color 0.4s ease;
+        }
+
+        .apple-glass:hover {
+            border-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 30px 60px -10px rgba(20, 90, 55, 0.28),
+                        inset 0 1px 2px rgba(255, 255, 255, 1);
+        }
+
+        /* 3. GERÇEKÇİ GÜNEŞ – kırmızı çekirdek, büyük boyut */
+        @keyframes sunCorePulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 60px rgba(253, 224, 71, 0.9)) drop-shadow(0 0 120px rgba(250, 204, 21, 0.6)); }
+            50% { transform: scale(1.06); filter: drop-shadow(0 0 90px rgba(253, 224, 71, 1)) drop-shadow(0 0 160px rgba(245, 158, 11, 0.75)); }
+        }
+
+        @keyframes sunCoronaSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.05); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        @keyframes sunRedPulse {
+            0%, 100% { opacity: 0.85; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.15); }
+        }
+
+        .sun-core { animation: sunCorePulse 4.5s ease-in-out infinite; }
+        .sun-corona { animation: sunCoronaSpin 30s linear infinite; }
+        .sun-red-core { animation: sunRedPulse 3s ease-in-out infinite; }
+
+        /* 4. NEON YEŞİL HALKA */
+        @keyframes laserRingSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes neonPulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.6), 0 0 40px rgba(22, 163, 74, 0.35), inset 0 0 12px rgba(34, 197, 94, 0.4); }
+            50% { box-shadow: 0 0 38px rgba(34, 197, 94, 0.9), 0 0 70px rgba(22, 163, 74, 0.6), inset 0 0 22px rgba(34, 197, 94, 0.7); }
+        }
+
+        .neon-ring-container { animation: neonPulseGlow 3s ease-in-out infinite; }
+
+        .laser-ring-spinner {
+            background: conic-gradient(from 0deg, transparent 0%, #22c55e 25%, transparent 50%, #16a34a 75%, transparent 100%);
+            animation: laserRingSpin 5s linear infinite;
+        }
+
+        /* 5. EQUALIZER */
+        .eq-bar { animation: eqPulse 1.2s ease-in-out infinite alternate; }
+        .eq-bar:nth-child(1) { animation-delay: 0.1s; }
+        .eq-bar:nth-child(2) { animation-delay: 0.3s; }
+        .eq-bar:nth-child(3) { animation-delay: 0.5s; }
+        .eq-bar:nth-child(4) { animation-delay: 0.2s; }
+
+        @keyframes eqPulse {
+            0% { height: 4px; }
+            100% { height: 20px; }
+        }
+
+        /* DAKTİLO */
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s step-start infinite;
+            color: #16a34a;
+            font-weight: 200;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* KANVAS – arka plan topları */
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* KANVAS – yaprak/kiraç ön plan */
+        #interactive-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .photo-size {
+            width: 240px;
+            height: 240px;
+        }
+        @media (min-width: 640px) {
+            .photo-size { width: 300px; height: 300px; }
+        }
+
+        .text-deep { color: #143d24; }
+        .text-soft { color: #2f6b47; }
     </style>
 </head>
-<body>
+<body class="apple-gradient-bg min-h-screen flex flex-col justify-between relative">
 
-    <!-- Arka plan animasyonu (Çizgiler ve Kalpler) -->
-    <canvas id="embers-canvas"></canvas>
+    <!-- ARKA PLAN YEŞİL TOPLAR (interaktif) -->
+    <canvas id="bg-canvas"></canvas>
 
-    <!-- Özel İmleç -->
-    <div class="custom-cursor"></div>
-    <div class="cursor-dot"></div>
+    <!-- YAPRAK & KİRAZ ÖN PLAN -->
+    <canvas id="interactive-canvas"></canvas>
 
-    <!-- Karşılama Ekranı -->
-    <header class="hero">
-        <h1>canım</h1>
-        <div class="scroll-down">Yavaşça Aşağı Kaydır ▼</div>
+    <!-- SOL ÜST: GERÇEKÇİ BÜYÜK GÜNEŞ -->
+    <div class="fixed top-0 left-0 z-30 pointer-events-none p-2 sm:p-4">
+        <div class="relative w-56 h-56 sm:w-80 sm:h-80 flex items-center justify-center">
+
+            <!-- Dış hale / corona -->
+            <div class="absolute inset-0 sun-corona rounded-full bg-gradient-to-tr from-yellow-200/50 via-orange-200/30 to-transparent blur-2xl"></div>
+            <div class="absolute w-80 h-80 sm:w-[28rem] sm:h-[28rem] rounded-full bg-yellow-200/40 blur-3xl"></div>
+            <div class="absolute w-72 h-72 sm:w-[24rem] sm:h-[24rem] rounded-full bg-amber-200/30 blur-2xl"></div>
+
+            <!-- Ana güneş çekirdeği (büyük) -->
+            <div class="sun-core relative w-32 h-32 sm:w-48 sm:h-48 rounded-full flex items-center justify-center border-2 border-white/90"
+                 style="background: radial-gradient(circle, #fef3c7 0%, #fde68a 35%, #fbbf24 65%, #f59e0b 100%);">
+
+                <!-- Orta katman -->
+                <div class="absolute inset-3 sm:inset-4 rounded-full"
+                     style="background: radial-gradient(circle, #fffbeb 0%, #fde68a 50%, #f59e0b 100%); opacity: 0.95;"></div>
+
+                <!-- İÇ KIRMIZI ÇEKİRDEK (gerçekçi) -->
+                <div class="sun-red-core absolute w-12 h-12 sm:w-20 sm:h-20 rounded-full"
+                     style="background: radial-gradient(circle, #fecaca 0%, #f87171 30%, #ef4444 60%, #dc2626 100%);
+                            box-shadow: 0 0 30px rgba(239, 68, 68, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.5);">
+                    <div class="absolute inset-2 rounded-full"
+                         style="background: radial-gradient(circle, #ffffff 0%, #fecaca 40%, #ef4444 100%); opacity: 0.7;"></div>
+                </div>
+
+                <!-- İç parlaklık -->
+                <div class="absolute top-2 left-3 w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-white/80 blur-sm"></div>
+            </div>
+
+            <!-- Lens flare çizgileri -->
+            <div class="absolute w-[250%] h-[2px] bg-gradient-to-r from-transparent via-yellow-100/80 to-transparent transform -rotate-12 blur-[0.5px]"></div>
+            <div class="absolute w-[250%] h-[2px] bg-gradient-to-r from-transparent via-orange-200/60 to-transparent transform rotate-45 blur-[0.5px]"></div>
+            <div class="absolute w-[200%] h-[1px] bg-gradient-to-r from-transparent via-red-200/40 to-transparent transform rotate-90 blur-[0.5px]"></div>
+        </div>
+    </div>
+
+    <!-- ÜST BAR -->
+    <header class="w-full pt-6 px-6 z-20 flex justify-between items-center max-w-7xl mx-auto">
+        <div class="w-40 hidden sm:block"></div>
+
+        <div class="apple-glass rounded-full px-6 py-2.5 flex items-center space-x-4 shadow-xl mx-auto sm:mx-0">
+            <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping"></span>
+            <span class="apple-body text-xs sm:text-sm font-medium text-deep">Aşk Bahçemiz • Canlı</span>
+        </div>
+
+        <div class="apple-glass rounded-full px-4 py-2 flex items-center space-x-3 cursor-pointer hover:scale-105 transition transform" onclick="toggleAudio()">
+            <div class="flex items-center space-x-1 h-5">
+                <div class="w-1 bg-green-500 rounded-full eq-bar"></div>
+                <div class="w-1 bg-green-400 rounded-full eq-bar"></div>
+                <div class="w-1 bg-emerald-500 rounded-full eq-bar"></div>
+                <div class="w-1 bg-teal-400 rounded-full eq-bar"></div>
+            </div>
+            <span id="musicText" class="apple-body text-xs font-medium text-deep">Müzik Çal</span>
+        </div>
     </header>
 
-    <!-- Fotoğraf ve Şiir İçeriği -->
-    <section class="story-container">
-        
-        <!-- Fotoğraf 1 -->
-        <div class="story-item left">
-            <div class="image-wrapper">
-                <img src="foto1.jpg" alt="Anı 1">
-            </div>
-            <div class="poem-text">Oyun oynarken çaldım o öpücüğü senden,</div>
+    <!-- ANA İÇERİK -->
+    <main class="flex-grow flex flex-col items-center justify-center px-4 py-8 z-10 max-w-6xl mx-auto w-full">
+
+        <!-- Başlık – Apple typography -->
+        <div class="text-center mb-8 space-y-3">
+            <h1 class="apple-large-title text-3xl sm:text-5xl text-deep drop-shadow-[0_2px_10px_rgba(255,255,255,0.6)]">
+                CANIM
+            </h1>
+            <p class="apple-title text-4xl sm:text-6xl text-emerald-700 drop-shadow-sm leading-tight">
+                Seni Çok Seviyorum <span id="partnerName"></span>
+            </p>
         </div>
 
-        <!-- Fotoğraf 2 -->
-        <div class="story-item right">
-            <div class="poem-text">Bal damlayan o tatlı dudaklarından.</div>
-            <div class="image-wrapper">
-                <img src="foto2.jpg" alt="Anı 2">
+        <!-- CAM KART -->
+        <div class="apple-glass rounded-[32px] sm:rounded-[44px] p-6 sm:p-14 w-full max-w-5xl shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 relative overflow-hidden">
+
+            <div class="absolute -top-24 -left-24 w-80 h-80 bg-green-200/40 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-80 h-80 bg-emerald-200/40 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- FOTOĞRAF -->
+            <div class="relative flex items-center justify-center flex-shrink-0 my-2">
+
+                <div class="absolute -inset-5 sm:-inset-7 rounded-full neon-ring-container p-1 flex items-center justify-center overflow-hidden">
+                    <div class="absolute inset-0 laser-ring-spinner opacity-90 rounded-full"></div>
+                </div>
+
+                <div class="relative photo-size rounded-full overflow-hidden border-4 border-white z-10 bg-emerald-100 shadow-2xl">
+                    <img id="mainPhoto"
+                         src="pw.jpg"
+                         alt="Aşkımızın Fotoğrafı"
+                         class="w-full h-full object-cover transform hover:scale-105 transition duration-700 ease-out">
+                </div>
+
+                <div class="absolute -bottom-2 z-20 apple-glass rounded-full px-4 py-1.5 flex items-center gap-1.5 shadow-lg">
+                    <span class="text-xs">🌿</span>
+                    <span class="apple-body text-xs font-medium text-deep">Sonsuzluğum</span>
+                </div>
+            </div>
+
+            <!-- ŞİİR – BÜYÜTÜLMÜŞ -->
+            <div class="flex flex-col text-center lg:text-left justify-center space-y-6 z-10 flex-grow max-w-2xl">
+
+                <div class="flex items-center justify-center lg:justify-start space-x-3">
+                    <span class="apple-body text-xs tracking-[0.2em] font-semibold uppercase text-emerald-800 bg-white/60 px-4 py-1.5 rounded-full border border-white/80">
+                        Özel Aşk Şiiri
+                    </span>
+                </div>
+
+                <!-- Şiir metni – çok daha büyük -->
+                <div class="apple-title text-3xl sm:text-4xl lg:text-5xl text-emerald-900 leading-[1.4] min-h-[280px] flex items-center justify-center lg:justify-start">
+                    <p id="poemText" class="typing-cursor drop-shadow-sm"></p>
+                </div>
+
+                <div class="pt-5 border-t border-white/60 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p class="apple-body text-sm text-soft font-light italic">
+                        ✨ "Gözlerin gözlerimde bir ömür kalsın..."
+                    </p>
+
+                    <button onclick="triggerLoveBurst(event)" class="apple-glass hover:bg-white/70 text-deep px-6 py-3 rounded-full apple-body text-sm font-medium tracking-wide transition transform active:scale-95 flex items-center gap-2 cursor-pointer">
+                        <span>💚 Kalbimi Gönder</span>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Fotoğraf 3 -->
-        <div class="story-item left">
-            <div class="image-wrapper">
-                <img src="foto3.jpg" alt="Anı 3">
-            </div>
-            <div class="poem-text">Ama cezasız kalmadı bu cüretim;</div>
-        </div>
+    </main>
 
-        <!-- Fotoğraf 4 -->
-        <div class="story-item right">
-            <div class="poem-text">Sanki bir çarmıha gerilmiş gibi kıvrandım saatlerce,</div>
-            <div class="image-wrapper">
-                <img src="foto4.jpg" alt="Anı 4">
-            </div>
-        </div>
+    <!-- MODAL -->
+    <div id="appleModal" class="fixed inset-0 bg-emerald-950/40 backdrop-blur-xl z-50 hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="apple-glass rounded-[36px] max-w-lg w-full p-8 text-center relative shadow-2xl transform scale-95 transition-transform duration-300" id="modalContent">
 
-        <!-- Fotoğraf 5 -->
-        <div class="story-item left">
-            <div class="image-wrapper">
-                <img src="foto5.jpg" alt="Anı 5">
+            <div class="w-16 h-16 bg-white/70 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                🌿
             </div>
-            <div class="poem-text">Ne kadar yalvarsam da dindiremedim öfkeni. <br><br>Çünkü o tek bir öpücük,</div>
-        </div>
 
-        <!-- Fotoğraf 6 -->
-        <div class="story-item right">
-            <div class="poem-text">Bütün zehirlerin en acısı oldu kanıma;<br><br>Tenime değdiği andan beri<br>Ne aklım başımda kaldı benim,</div>
-            <div class="image-wrapper">
-                <img src="foto6.jpg" alt="Anı 6">
-            </div>
-        </div>
+            <h3 class="apple-title text-2xl text-deep font-bold mb-3">Sonsuz Sevgimle</h3>
 
-        <!-- Fotoğraf 7 (Final Vurgusu) -->
-        <div class="story-item center">
-            <div class="image-wrapper">
-                <img src="foto7.jpg" alt="Anı 7">
-            </div>
-            <div class="poem-text highlight">Ne de dudaklarımdan silindi o yangın.</div>
-        </div>
+            <p class="apple-body text-sm sm:text-base text-soft leading-relaxed font-light mb-8">
+                "Hayatımdaki en güzel detay, attığım her adımda senin varlığını hissetmek. Günlerim seninle aydınlanıyor, iyi ki hayatımdasın sevgilim."
+            </p>
 
-    </section>
+            <button onclick="closeAppleModal()" class="w-full py-3.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white rounded-2xl apple-body text-sm font-semibold tracking-wide transition shadow-lg cursor-pointer">
+                Seni Çok Seviyorum 💚
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="w-full py-6 text-center apple-body text-xs text-soft z-10 border-t border-white/40">
+        Designed with Love for My Green Garden • 2026 -> 2126 
+    </footer>
+
+    <audio id="bgMusic" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-love-112188.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
-        // 1. ÖZEL İMLEÇ KODU
-        const cursor = document.querySelector('.custom-cursor');
-        const cursorDot = document.querySelector('.cursor-dot');
+        /* 1. DAKTİLO */
+        const poemLines = [
+            "Sen ve ben, birbirimize ayna olan iki ruhuz,",
+            "Bir bedende iki can, bir gönülde iki dünya.",
+            "Seninle ben, ayrı ayrı görünsek de,",
+            "Aslında tek bir aşkız, sonsuzluğa uzanan."
+        ];
 
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursorDot.style.left = e.clientX + 'px';
-            cursorDot.style.top = e.clientY + 'px';
-        });
+        let lineIndex = 0;
+        let charIndex = 0;
+        const poemElem = document.getElementById('poemText');
 
-        const interactables = document.querySelectorAll('.image-wrapper, .scroll-down');
-        interactables.forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursor.style.width = '40px';
-                cursor.style.height = '40px';
-                cursor.style.backgroundColor = 'rgba(217, 4, 41, 0.2)';
-            });
-            el.addEventListener('mouseleave', () => {
-                cursor.style.width = '20px';
-                cursor.style.height = '20px';
-                cursor.style.backgroundColor = 'transparent';
-            });
-        });
-
-        // 2. SCROLL GÖRÜNÜRLÜK KODU
-        const observerOptions = { threshold: 0.3 };
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
+        function typePoem() {
+            if (lineIndex < poemLines.length) {
+                if (charIndex < poemLines[lineIndex].length) {
+                    poemElem.innerHTML += poemLines[lineIndex].charAt(charIndex);
+                    charIndex++;
+                    setTimeout(typePoem, 60);
+                } else {
+                    poemElem.innerHTML += "<br/>";
+                    lineIndex++;
+                    charIndex = 0;
+                    setTimeout(typePoem, 500);
                 }
-            });
-        }, observerOptions);
+            }
+        }
+        window.addEventListener('load', () => setTimeout(typePoem, 700));
 
-        document.querySelectorAll('.story-item').forEach(item => {
-            observer.observe(item);
+        /* 2. MOUSE TAKİBİ */
+        window.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            document.body.style.setProperty('--mouse-x', `${x}%`);
+            document.body.style.setProperty('--mouse-y', `${y}%`);
         });
 
-        // 3. ARKA PLAN ÇİZGİLER VE KALPLER EFEKTİ KODU
-        const canvas = document.getElementById('embers-canvas');
+        /* ============================================================
+           3. ARKA PLAN YEŞİL TOPLAR (bg-canvas)
+           ============================================================ */
+        const bgCanvas = document.getElementById('bg-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+
+        function resizeBg() {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeBg);
+        resizeBg();
+
+        let bgMouse = { x: bgCanvas.width / 2, y: bgCanvas.height / 2 };
+        window.addEventListener('mousemove', (e) => {
+            bgMouse.x = e.clientX;
+            bgMouse.y = e.clientY;
+        });
+
+        const bgBalls = [];
+        const BG_BALL_COUNT = 40;
+
+        for (let i = 0; i < BG_BALL_COUNT; i++) {
+            bgBalls.push({
+                x: Math.random() * bgCanvas.width,
+                y: Math.random() * bgCanvas.height,
+                r: Math.random() * 80 + 40,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                opacity: Math.random() * 0.25 + 0.15,
+                hue: 120 + Math.random() * 40, // yeşil tonlar
+            });
+        }
+
+        function animateBg() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+            bgBalls.forEach(b => {
+                b.x += b.vx;
+                b.y += b.vy;
+
+                if (b.x < -b.r) b.x = bgCanvas.width + b.r;
+                if (b.x > bgCanvas.width + b.r) b.x = -b.r;
+                if (b.y < -b.r) b.y = bgCanvas.height + b.r;
+                if (b.y > bgCanvas.height + b.r) b.y = -b.r;
+
+                // Fare etkileşimi – hafif itme
+                const dx = b.x - bgMouse.x;
+                const dy = b.y - bgMouse.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 200 && dist > 0) {
+                    const force = (200 - dist) / 200 * 0.4;
+                    b.x += (dx / dist) * force;
+                    b.y += (dy / dist) * force;
+                }
+
+                // Radyal gradyan top
+                const grad = bgCtx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+                grad.addColorStop(0, `hsla(${b.hue}, 70%, 75%, ${b.opacity + 0.15})`);
+                grad.addColorStop(0.6, `hsla(${b.hue}, 65%, 65%, ${b.opacity})`);
+                grad.addColorStop(1, `hsla(${b.hue}, 60%, 60%, 0)`);
+
+                bgCtx.fillStyle = grad;
+                bgCtx.beginPath();
+                bgCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                bgCtx.fill();
+            });
+
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+        /* ============================================================
+           4. YAPRAK & KİRAZ (interactive-canvas) – 20x fazla
+           ============================================================ */
+        const canvas = document.getElementById('interactive-canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
 
-        const elementsArray = [];
-        
-        class BackgroundElement {
-            constructor() {
-                // %40 ihtimalle kalp, %60 ihtimalle çizgi oluşacak
-                this.type = Math.random() > 0.6 ? 'heart' : 'line';
-                this.x = Math.random() * canvas.width;
-                this.y = canvas.height + Math.random() * 200;
-                this.opacity = Math.random() * 0.4 + 0.1; // Hafif saydam
-                
-                if (this.type === 'heart') {
-                    this.scale = Math.random() * 1.5 + 0.5;
-                    this.speedY = Math.random() * -1 - 0.5; // Yukarı süzülme
-                    this.speedX = (Math.random() - 0.5) * 1; // Sağa sola hafif sallanma
-                } else {
-                    this.length = Math.random() * 150 + 50;
-                    this.angle = Math.random() * Math.PI * 2; // Çizgi açısı
-                    this.speedY = Math.random() * -1.5 - 0.5;
-                    this.speedX = (Math.random() - 0.5) * 2;
-                    this.thickness = Math.random() * 1.5 + 0.5;
-                }
-            }
-            
-            update() {
-                this.y += this.speedY;
-                this.x += this.speedX;
-                
-                // Ekranın üstünden çıkarsa aşağıdan tekrar başlat
-                if (this.y < -150 || this.x < -100 || this.x > canvas.width + 100) {
-                    this.y = canvas.height + 100;
-                    this.x = Math.random() * canvas.width;
-                }
-            }
-            
-            draw() {
-                ctx.save();
-                if (this.type === 'heart') {
-                    // Kalp çizimi
-                    ctx.translate(this.x, this.y);
-                    ctx.scale(this.scale, this.scale);
-                    ctx.beginPath();
-                    ctx.moveTo(0, -3);
-                    ctx.bezierCurveTo(-5, -8, -10, 0, 0, 8);
-                    ctx.bezierCurveTo(10, 0, 5, -8, 0, -3);
-                    ctx.fillStyle = `rgba(217, 4, 41, ${this.opacity})`;
-                    ctx.fill();
-                } else {
-                    // Bağımsız ince çizgi çizimi
-                    ctx.beginPath();
-                    ctx.moveTo(this.x, this.y);
-                    // Çizginin uzunluğu ve açısına göre bitiş noktasını hesapla
-                    let endX = this.x + Math.cos(this.angle) * this.length;
-                    let endY = this.y + Math.sin(this.angle) * this.length;
-                    ctx.lineTo(endX, endY);
-                    ctx.strokeStyle = `rgba(217, 4, 41, ${this.opacity})`;
-                    ctx.lineWidth = this.thickness;
-                    ctx.stroke();
-                }
-                ctx.restore();
-            }
-        }
-
-        function initBackground() {
-            // Ekranda aynı anda olacak toplam şekil sayısı
-            for (let i = 0; i < 40; i++) {
-                elementsArray.push(new BackgroundElement());
-            }
-        }
-
-        function animateBackground() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < elementsArray.length; i++) {
-                elementsArray[i].update();
-                elementsArray[i].draw();
-            }
-            requestAnimationFrame(animateBackground);
-        }
-
-        window.addEventListener('resize', () => {
+        function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
         });
 
-        initBackground();
-        animateBackground();
+        const particles = [];
+        const ripples = [];
+        // 20x çarpılmış: eskiden 120 idi -> 120 * 20 = 2400
+        // Performans için 800 tutalım — istersen 2400 yapabilirsin
+        const particleCount = 800;
+
+        for (let i = 0; i < particleCount; i++) {
+            let type;
+            const r = Math.random();
+            if (r < 0.6) type = 'leaf';
+            else if (r < 0.85) type = 'cherry';
+            else type = 'firefly';
+
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 6 + 4,
+                speedY: Math.random() * 0.7 + 0.25,
+                speedX: (Math.random() - 0.5) * 1.2,
+                angle: Math.random() * 360,
+                spin: (Math.random() - 0.5) * 2.5,
+                type: type,
+                opacity: Math.random() * 0.6 + 0.4
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            ripples.push({ x: e.clientX, y: e.clientY, radius: 2, alpha: 1 });
+        });
+
+        function drawLeaf(p) {
+            ctx.rotate((p.angle * Math.PI) / 180);
+            ctx.globalAlpha = p.opacity;
+            ctx.fillStyle = '#4ade80';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, p.size * 1.6, p.size / 2.2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(22, 101, 52, 0.5)';
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(-p.size * 1.4, 0);
+            ctx.lineTo(p.size * 1.4, 0);
+            ctx.stroke();
+        }
+
+        function drawCherry(p) {
+            ctx.globalAlpha = p.opacity;
+            ctx.strokeStyle = '#166534';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(0, -p.size * 0.4);
+            ctx.quadraticCurveTo(p.size * 0.5, -p.size * 1.2, p.size * 0.2, -p.size * 1.8);
+            ctx.stroke();
+            ctx.fillStyle = '#dc2626';
+            ctx.beginPath();
+            ctx.arc(-p.size * 0.5, 0, p.size * 0.7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(p.size * 0.5, p.size * 0.2, p.size * 0.7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+            ctx.beginPath();
+            ctx.arc(-p.size * 0.65, -p.size * 0.2, p.size * 0.18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(p.size * 0.35, 0, p.size * 0.18, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawFirefly(p) {
+            const glow = Math.sin(Date.now() * 0.004 + p.x) * 0.5 + 0.5;
+            ctx.globalAlpha = p.opacity * glow;
+            ctx.fillStyle = '#fde047';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#facc15';
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size * 0.55, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                const r = ripples[i];
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(34, 197, 94, ${r.alpha})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.restore();
+                r.radius += 2.5;
+                r.alpha -= 0.025;
+                if (r.alpha <= 0) ripples.splice(i, 1);
+            }
+
+            particles.forEach(p => {
+                p.y += p.speedY;
+                p.x += p.speedX;
+                p.angle += p.spin;
+
+                if (p.y > canvas.height + 30) {
+                    p.y = -30;
+                    p.x = Math.random() * canvas.width;
+                }
+                if (p.x > canvas.width + 30) p.x = -30;
+                if (p.x < -30) p.x = canvas.width + 30;
+
+                const dx = mouse.x - p.x;
+                const dy = mouse.y - p.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 130 && dist > 0) {
+                    const force = (130 - dist) / 130;
+                    p.x -= (dx / dist) * force * 2.2;
+                    p.y -= (dy / dist) * force * 2.2;
+                }
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+
+                if (p.type === 'leaf') drawLeaf(p);
+                else if (p.type === 'cherry') drawCherry(p);
+                else drawFirefly(p);
+
+                ctx.restore();
+            });
+
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        /* 5. MÜZİK */
+        const audio = document.getElementById('bgMusic');
+        let isPlaying = false;
+
+        function toggleAudio() {
+            const musicText = document.getElementById('musicText');
+            if (!isPlaying) {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    musicText.innerText = "Müzik Çalıyor";
+                }).catch(() => alert("Müzik çalınamadı. Lütfen sayfaya dokunun."));
+            } else {
+                audio.pause();
+                isPlaying = false;
+                musicText.innerText = "Müzik Çal";
+            }
+        }
+
+        /* 6. KALP PATLAMASI */
+        function triggerLoveBurst(e) {
+            for (let i = 0; i < 18; i++) {
+                const heart = document.createElement('div');
+                heart.innerText = '💚';
+                heart.style.position = 'fixed';
+                heart.style.left = e.clientX + 'px';
+                heart.style.top = e.clientY + 'px';
+                heart.style.fontSize = Math.random() * 22 + 16 + 'px';
+                heart.style.pointerEvents = 'none';
+                heart.style.zIndex = '999';
+                heart.style.transition = 'all 1s cubic-bezier(0.16, 1, 0.3, 1)';
+                document.body.appendChild(heart);
+
+                setTimeout(() => {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = Math.random() * 170 + 60;
+                    heart.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist - 120}px) scale(0)`;
+                    heart.style.opacity = '0';
+                }, 20);
+
+                setTimeout(() => heart.remove(), 1000);
+            }
+        }
+
+        /* 7. MODAL */
+        function openAppleModal() {
+            const modal = document.getElementById('appleModal');
+            const content = document.getElementById('modalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 20);
+        }
+
+        function closeAppleModal() {
+            const modal = document.getElementById('appleModal');
+            const content = document.getElementById('modalContent');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
     </script>
 </body>
 </html>
